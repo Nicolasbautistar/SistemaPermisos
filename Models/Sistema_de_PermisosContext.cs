@@ -15,8 +15,7 @@ namespace Sistema_de_Permisos.Models
             : base(options)
         {
         }
-
-        public virtual DbSet<string> ResponseSp { get; set; } = null!;
+        
         public virtual DbSet<BranchOffice> BranchOffices { get; set; } = null!;
         public virtual DbSet<Company> Companies { get; set; } = null!;
         public virtual DbSet<CostCenter> CostCenters { get; set; } = null!;
