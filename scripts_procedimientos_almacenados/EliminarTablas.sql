@@ -17,11 +17,11 @@ BEGIN
 	DROP TABLE IF EXISTS BranchOffice;
 	DROP TABLE IF EXISTS Company;
 
-	PRINT 'Tablas eliminadas exitosamente.'
+	SELECT 'Tablas eliminadas exitosamente.'
 END
 ELSE
 BEGIN
-PRINT 'No existen tablas para eliminar.'
+SELECT 'No existen tablas para eliminar.'
 END
 END
 

@@ -354,3 +354,5 @@ select 'Número de tablas creadas: ' + CAST(@Contador AS NVARCHAR(10));
 END
 --DROP PROCEDURE spCrearTablas
 --EXEC spCrearTablas
+
+

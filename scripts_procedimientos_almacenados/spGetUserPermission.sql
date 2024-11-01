@@ -88,6 +88,4 @@ END
 END;
 
 
---exec spGetUserPermission @EntityCatalogID = 1, @UserID = 1
 
---drop procedure spGetUserPermission

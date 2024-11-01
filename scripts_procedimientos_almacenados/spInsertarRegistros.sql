@@ -16,7 +16,7 @@ OR NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'PermiR
 OR NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'PermiUser')
 OR NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'PermiRole')
 BEGIN
- PRINT 'Debe crear primero las tablas.';
+ SELECT 'Debe crear primero las tablas.';
     RETURN;
 END
 If (SELECT COUNT(1) FROM Company)= 0
@@ -211,10 +211,10 @@ BEGIN
 END
 END TRY
 BEGIN CATCH
- PRINT 'Ocurrió un error al crear las tablas.';
+ SELECT 'Ocurrió un error al crear las tablas.';
     RETURN;
 END CATCH
-PRINT 'Registros de prueba Insertados'
+SELECT 'Registros de prueba Insertados'
 END
 
 
