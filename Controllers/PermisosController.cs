@@ -1,56 +1,143 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sistema_de_Permisos.Models;
+using Sistema_de_Permisos.Conector.Datos;
 using Dapper;
-using System;
-using System.Reflection.Metadata;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Data;
 
 namespace Sistema_de_Permisos.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class PermisosController : ControllerBase
-    {
-        private readonly Sistema_de_PermisosContext dbConection;
-        public PermisosController(Sistema_de_PermisosContext _context) 
-        {
-            dbConection = _context; 
-        }
-        [HttpPost]
-        [Route("PruebaProcedimiento")]
-        public IActionResult PruebaProcedimiento(string CadenaEntrada)
+    {        
+        [HttpGet]
+        [Route("CrearTablas")]
+        public IActionResult CrearTablas()
         {
             try
             {
-                var Prueba = new SqlParameter("@Nombre", CadenaEntrada);
-                //var result = dbConection.ResponseSp.FromSqlRaw("EXEC spPrueba").FirstOrDefault();
-                var result = dbConection.Set<string>().FromSqlRaw("EXEC spPrueba").FirstOrDefault();
-                
-                //var result = dbConection.Set<string>().FromSqlRaw("EXEC spPrueba").FirstOrDefault();
-                //var result = dbConection.Set<string>().FromSqlRaw("EXEC spPrueba @Nombre", Prueba).FirstOrDefault();
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = result });
+                using (var db = Conexion.Instancia().GetConnection())
+                {
+                    db.Open();
+                    string sql = "EXEC spCrearTablas";
+                    string? resultado = db.Query<string>(sql).FirstOrDefault();
+                    // Obtener el valor de salida
+                    return StatusCode(StatusCodes.Status200OK, new { mensaje = resultado });
+                } 
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = ex.Message });
             }
         }
 
         [HttpGet]
-        [Route("GetCompanyList")]
-        public IActionResult GetCompanyList()
+        [Route("EliminarTablas")]
+        public IActionResult EliminarTablas()
         {
             try
             {
-                List<Company> ListCompany = dbConection.Companies.ToList();
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok", Response = ListCompany });
+                using (var db = Conexion.Instancia().GetConnection())
+                {
+                    db.Open();
+                    string sql = "EXEC spEliminarTablas";
+                    string? resultado = db.Query<string>(sql).FirstOrDefault();
+                    // Obtener el valor de salida
+                    return StatusCode(StatusCodes.Status200OK, new { mensaje = resultado });
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("InsertarRegistros")]
+        public IActionResult InsertarRegistros()
+        {
+            try
+            {
+                using (var db = Conexion.Instancia().GetConnection())
+                {
+                    db.Open();
+                    string sql = "EXEC spInsertarRegistros";
+                    string? resultado = db.Query<string>(sql).FirstOrDefault();
+                    // Obtener el valor de salida
+                    return StatusCode(StatusCodes.Status200OK, new { mensaje = resultado });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("ObtenerPermisosDeUsuario")]
+        public IActionResult ObtenerPermisosDeUsuario(int Entidad, long UsuarioId)
+        {
+            try
+            {
+                using (var db = Conexion.Instancia().GetConnection())
+                {
+                    db.Open();
+                    var Parametros = new DynamicParameters();
+                    Parametros.Add("@Entidad", Entidad);
+                    Parametros.Add("@UsuarioId", UsuarioId);
+                    string sql = "EXEC spGetUserPermission @EntityCatalogID = @Entidad, @UserID = @UsuarioId ";
+                    List<dynamic> resultado = db.Query<dynamic>(sql, Parametros).ToList();
+                    // Obtener el valor de salida
+                    return StatusCode(StatusCodes.Status200OK, new { mensaje = resultado });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("ObtenerUsuarios")]
+        public IActionResult ObtenerUsuarios()
+        {
+            try
+            {
+                using (var db = Conexion.Instancia().GetConnection())
+                {
+                    db.Open();
+
+                    string sql = "SELECT id_user [ID], user_username [Nombre Usuario] FROM [User]  ";
+                    List<dynamic> resultado = db.Query<dynamic>(sql).ToList();
+                    // Obtener el valor de salida
+                    return StatusCode(StatusCodes.Status200OK, new { mensaje = resultado });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("ObtenerEntidades")]
+        public IActionResult ObtenerEntidades()
+        {
+            try
+            {
+                using (var db = Conexion.Instancia().GetConnection())
+                {
+                    db.Open();
+
+                    string sql = "select id_entit [Id Entidad], entit_name [Nombre Entidad], entit_descrip [Descripción] from EntityCatalog";
+                    List<dynamic> resultado = db.Query<dynamic>(sql).ToList();
+                    // Obtener el valor de salida
+                    return StatusCode(StatusCodes.Status200OK, new { mensaje = resultado });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { mensaje = ex.Message });
             }
         }
     }
